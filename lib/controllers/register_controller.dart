@@ -13,7 +13,7 @@ class RegisterController extends GetxController {
   var isPasswordVisible = false.obs;
   var isLoading = false.obs;
 
-  final String apiUrl = "https://berlianmandiriperkasa.vercel.app/api/register";
+  final String apiUrl = "https://berlianmandiriperkasa.vercel.app/api/api/register";
 
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
