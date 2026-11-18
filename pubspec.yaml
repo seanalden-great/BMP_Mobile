@@ -43,6 +43,18 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # Tambahkan library ini:
+  flutter_launcher_icons: ^0.13.1
+
+# Tambahkan blok konfigurasi ini di bagian paling bawah file pubspec.yaml:
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/bmp_logo.jpeg"
+  # Opsional: Jika logo Anda tidak memiliki latar belakang (transparan), 
+  # Anda bisa menambahkan warna latar belakang putih:
+  # adaptive_icon_background: "#FFFFFF" 
+  # adaptive_icon_foreground: "assets/bmp_logo.jpeg"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
