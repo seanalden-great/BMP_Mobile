@@ -6,9 +6,18 @@ import '../../controllers/dashboard_controller.dart';
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
 
+  // FUNGSI YANG DIPERBAIKI: Konversi otomatis jika backend mengirim String
   String _formatRp(dynamic number) {
     if (number == null) return "Rp 0";
-    return NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(number);
+    
+    double parsedNumber = 0;
+    if (number is String) {
+      parsedNumber = double.tryParse(number) ?? 0;
+    } else if (number is num) {
+      parsedNumber = number.toDouble();
+    }
+
+    return NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(parsedNumber);
   }
 
   @override
@@ -38,7 +47,7 @@ class DashboardView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Ringkasan Finansial',
+                        'Dashboard',
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
                       ),
                       Text(
@@ -151,12 +160,12 @@ class DashboardView extends StatelessWidget {
               const SizedBox(height: 12),
               
               _buildSectionTitle('Pelanggan Terbaik', Icons.star, Colors.amber),
-              ...controller.topCustomers.map((c) => _buildListTile(c['contact']['name'] ?? 'Umum', _formatRp(c['total_spent']), 'Total Pembelanjaan')),
+              ...controller.topCustomers.map((c) => _buildListTile(c['contact'] != null ? c['contact']['name'] : 'Umum', _formatRp(c['total_spent']), 'Total Pembelanjaan')),
 
               const SizedBox(height: 12),
               _buildSectionTitle('Stok Menipis', Icons.warning_amber_rounded, Colors.orange),
-              ...controller.lowStocks.map((s) => _buildListTile(s['name'], '${s['total_stock']} ${s['unit'] ?? ''}', 'Sisa Tersedia')),
-              
+              // ...controller.lowStocks.map((s) => _buildListTile(s['name'], '${s['total_stock']} ${s['unit'] ?? ''}', 'Sisa Tersedia')),
+              ...controller.lowStocks.map((s) => _buildListTile(s['name'], '${s['total_stock'] ?? 0} ${s['unit'] ?? ''}', 'Sisa Tersedia')),
             ],
           ),
         );

@@ -1,4 +1,6 @@
+import 'package:bmp_mobile/views/approval/approval_view.dart';
 import 'package:bmp_mobile/views/dashboard/dashboard_view.dart';
+import 'package:bmp_mobile/views/profile/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,7 +38,8 @@ class MainLayout extends StatelessWidget {
     final List<Widget> pages = [
       const DashboardView(),
       const InventoryView(), // Ini adalah halaman Inventory yang baru
-      const Center(child: Text("Approval Center\n(Sedang Dikembangkan)", textAlign: TextAlign.center)),
+      const ApprovalView(),
+      const ProfileView(), // INI ADALAH MODUL PROFIL YANG BARU
     ];
 
     return Scaffold(
@@ -82,6 +85,11 @@ class MainLayout extends StatelessWidget {
               icon: Badge(child: Icon(Icons.fact_check_outlined)),
               selectedIcon: Badge(child: Icon(Icons.fact_check, color: Color(0xFF2563EB))),
               label: 'Persetujuan',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person, color: Color(0xFF2563EB)),
+              label: 'Profil',
             ),
           ],
         ),

@@ -12,6 +12,7 @@ class DashboardController extends GetxController {
   var topCustomers = [].obs;
   var recentActivities = [].obs;
 
+  // FUNGSI YANG DIPERBAIKI: Hapus /api ganda
   final String apiUrl = "https://berlianmandiriperkasa.vercel.app/api/api/dashboard";
 
   @override
