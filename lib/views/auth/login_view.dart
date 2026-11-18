@@ -121,6 +121,25 @@ class LoginView extends StatelessWidget {
                           ),
                         ),
                 )),
+                const SizedBox(height: 24),
+                
+                // --- TAMBAHAN BARU: TAUTAN KE HALAMAN REGISTRASI ---
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Karyawan baru?',
+                      style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                    ),
+                    TextButton(
+                      onPressed: () => Get.toNamed('/register'),
+                      child: const Text(
+                        'Daftar Akun ERP',
+                        style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
