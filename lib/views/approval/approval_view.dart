@@ -1,7 +1,21 @@
+import 'package:bmp_mobile/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/approval_controller.dart';
+
+void logout() async {
+  // Hapus sesi lokal
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('auth_token');
+
+  // Jangan lupa panggil API Logout ke server (Opsional tapi disarankan)
+  // ...
+
+  // Lempar kembali ke halaman Login secara permanen (hapus histori navigasi)
+  Get.offAllNamed(Routes.LOGIN);
+}
 
 class ApprovalView extends StatelessWidget {
   const ApprovalView({super.key});
@@ -24,15 +38,26 @@ class ApprovalView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // Slate-100
       appBar: AppBar(
-        title: const Text('Pusat Persetujuan', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: const Text('Pusat Persetujuan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: const Color(0xFF2563EB),
         foregroundColor: const Color(0xFF1E293B),
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.sync),
-            onPressed: controller.fetchApprovals,
-          ),
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Keluar',
+            onPressed: () {
+              Get.defaultDialog(
+                title: "Konfirmasi Keluar",
+                middleText: "Anda yakin ingin keluar dari sistem?",
+                textCancel: "Batal",
+                textConfirm: "Ya, Keluar",
+                confirmTextColor: Colors.white,
+                buttonColor: Colors.red,
+                onConfirm: () => logout(),
+              );
+            },
+          )
         ],
       ),
       body: Obx(() {

@@ -1,6 +1,20 @@
+import 'package:bmp_mobile/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/inventory_controller.dart';
+
+void logout() async {
+    // Hapus sesi lokal
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    
+    // Jangan lupa panggil API Logout ke server (Opsional tapi disarankan)
+    // ...
+
+    // Lempar kembali ke halaman Login secara permanen (hapus histori navigasi)
+    Get.offAllNamed(Routes.LOGIN);
+  }
 
 class InventoryView extends StatelessWidget {
   const InventoryView({super.key});
@@ -12,10 +26,27 @@ class InventoryView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Stok & Mutasi Gudang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.white,
+        title: const Text('Data Pergerakan Stok & Gudang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: const Color(0xFF2563EB),
         foregroundColor: const Color(0xFF1E293B),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Keluar',
+            onPressed: () {
+              Get.defaultDialog(
+                title: "Konfirmasi Keluar",
+                middleText: "Anda yakin ingin keluar dari sistem?",
+                textCancel: "Batal",
+                textConfirm: "Ya, Keluar",
+                confirmTextColor: Colors.white,
+                buttonColor: Colors.red,
+                onConfirm: () => logout(),
+              );
+            },
+          )
+        ],
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.adjustments.isEmpty) {

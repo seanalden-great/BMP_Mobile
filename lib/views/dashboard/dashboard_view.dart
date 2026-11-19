@@ -1,7 +1,21 @@
+import 'package:bmp_mobile/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/dashboard_controller.dart';
+
+void logout() async {
+  // Hapus sesi lokal
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('auth_token');
+
+  // Jangan lupa panggil API Logout ke server (Opsional tapi disarankan)
+  // ...
+
+  // Lempar kembali ke halaman Login secara permanen (hapus histori navigasi)
+  Get.offAllNamed(Routes.LOGIN);
+}
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -9,7 +23,7 @@ class DashboardView extends StatelessWidget {
   // FUNGSI YANG DIPERBAIKI: Konversi otomatis jika backend mengirim String
   String _formatRp(dynamic number) {
     if (number == null) return "Rp 0";
-    
+
     double parsedNumber = 0;
     if (number is String) {
       parsedNumber = double.tryParse(number) ?? 0;
@@ -17,7 +31,9 @@ class DashboardView extends StatelessWidget {
       parsedNumber = number.toDouble();
     }
 
-    return NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(parsedNumber);
+    return NumberFormat.currency(
+            locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
+        .format(parsedNumber);
   }
 
   @override
@@ -26,9 +42,33 @@ class DashboardView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // Slate-100
+      appBar: AppBar(
+        title: const Text('Home', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: const Color(0xFF2563EB),
+        foregroundColor: const Color(0xFF1E293B),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Keluar',
+            onPressed: () {
+              Get.defaultDialog(
+                title: "Konfirmasi Keluar",
+                middleText: "Anda yakin ingin keluar dari sistem?",
+                textCancel: "Batal",
+                textConfirm: "Ya, Keluar",
+                confirmTextColor: Colors.white,
+                buttonColor: Colors.red,
+                onConfirm: () => logout(),
+              );
+            },
+          )
+        ],
+      ),
       body: Obx(() {
         if (controller.isLoading.value && controller.summary.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: Color(0xFF2563EB)));
+          return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF2563EB)));
         }
 
         final sum = controller.summary;
@@ -48,11 +88,16 @@ class DashboardView extends StatelessWidget {
                     children: [
                       const Text(
                         'Dashboard',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E293B)),
                       ),
                       Text(
                         sum['bulan'] ?? 'Bulan Berjalan',
-                        style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                            color: Color(0xFF64748B),
+                            fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -81,8 +126,16 @@ class DashboardView extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Target Penjualan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
-                        Text('${sum['persentase_target'] ?? 0}%', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF2563EB))),
+                        const Text('Target Penjualan',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF94A3B8))),
+                        Text('${sum['persentase_target'] ?? 0}%',
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF2563EB))),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -94,7 +147,12 @@ class DashboardView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     const SizedBox(height: 8),
-                    Text('${_formatRp(sum['pendapatan'])} / ${_formatRp(sum['target_penjualan'])}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                    Text(
+                        '${_formatRp(sum['pendapatan'])} / ${_formatRp(sum['target_penjualan'])}',
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E293B))),
                   ],
                 ),
               ),
@@ -108,16 +166,33 @@ class DashboardView extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [Color(0xFF1E293B), Color(0xFF334155)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        gradient: const LinearGradient(
+                            colors: [Color(0xFF1E293B), Color(0xFF334155)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight),
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4))
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('SALDO KAS & BANK', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                          const Text('SALDO KAS & BANK',
+                              style: TextStyle(
+                                  color: Color(0xFF94A3B8),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.0)),
                           const SizedBox(height: 8),
-                          Text(_formatRp(sum['saldo_kas']), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                          Text(_formatRp(sum['saldo_kas']),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900)),
                         ],
                       ),
                     ),
@@ -128,15 +203,24 @@ class DashboardView extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF2563EB)]),
+                        gradient: const LinearGradient(
+                            colors: [Color(0xFF4F46E5), Color(0xFF2563EB)]),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text('MARGIN', style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 10, fontWeight: FontWeight.bold)),
+                          const Text('MARGIN',
+                              style: TextStyle(
+                                  color: Color(0xFFC7D2FE),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
-                          Text('${sum['profit_margin'] ?? 0}%', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                          Text('${sum['profit_margin'] ?? 0}%',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900)),
                         ],
                       ),
                     ),
@@ -148,24 +232,45 @@ class DashboardView extends StatelessWidget {
               // Grid Pendapatan & Pengeluaran
               Row(
                 children: [
-                  Expanded(child: _buildSummaryCard('Pendapatan', _formatRp(sum['pendapatan']), Icons.arrow_upward, const Color(0xFF10B981))),
+                  Expanded(
+                      child: _buildSummaryCard(
+                          'Pendapatan',
+                          _formatRp(sum['pendapatan']),
+                          Icons.arrow_upward,
+                          const Color(0xFF10B981))),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildSummaryCard('Pengeluaran', _formatRp(sum['pengeluaran']), Icons.arrow_downward, const Color(0xFFEF4444))),
+                  Expanded(
+                      child: _buildSummaryCard(
+                          'Pengeluaran',
+                          _formatRp(sum['pengeluaran']),
+                          Icons.arrow_downward,
+                          const Color(0xFFEF4444))),
                 ],
               ),
               const SizedBox(height: 24),
 
               // Section List: Top Customers & Low Stocks
-              const Text('Wawasan Bisnis', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+              const Text('Wawasan Bisnis',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B))),
               const SizedBox(height: 12),
-              
+
               _buildSectionTitle('Pelanggan Terbaik', Icons.star, Colors.amber),
-              ...controller.topCustomers.map((c) => _buildListTile(c['contact'] != null ? c['contact']['name'] : 'Umum', _formatRp(c['total_spent']), 'Total Pembelanjaan')),
+              ...controller.topCustomers.map((c) => _buildListTile(
+                  c['contact'] != null ? c['contact']['name'] : 'Umum',
+                  _formatRp(c['total_spent']),
+                  'Total Pembelanjaan')),
 
               const SizedBox(height: 12),
-              _buildSectionTitle('Stok Menipis', Icons.warning_amber_rounded, Colors.orange),
+              _buildSectionTitle(
+                  'Stok Menipis', Icons.warning_amber_rounded, Colors.orange),
               // ...controller.lowStocks.map((s) => _buildListTile(s['name'], '${s['total_stock']} ${s['unit'] ?? ''}', 'Sisa Tersedia')),
-              ...controller.lowStocks.map((s) => _buildListTile(s['name'], '${s['total_stock'] ?? 0} ${s['unit'] ?? ''}', 'Sisa Tersedia')),
+              ...controller.lowStocks.map((s) => _buildListTile(
+                  s['name'],
+                  '${s['total_stock'] ?? 0} ${s['unit'] ?? ''}',
+                  'Sisa Tersedia')),
             ],
           ),
         );
@@ -173,7 +278,8 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard(String title, String amount, IconData icon, Color color) {
+  Widget _buildSummaryCard(
+      String title, String amount, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -186,9 +292,17 @@ class DashboardView extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.bold)),
+          Text(title,
+              style: const TextStyle(
+                  fontSize: 11,
+                  color: Color(0xFF64748B),
+                  fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(amount, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFF1E293B))),
+          Text(amount,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF1E293B))),
         ],
       ),
     );
@@ -201,7 +315,11 @@ class DashboardView extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 8),
-          Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF475569))),
+          Text(title,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF475569))),
         ],
       ),
     );
@@ -219,12 +337,26 @@ class DashboardView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF334155)), overflow: TextOverflow.ellipsis)),
+          Expanded(
+              child: Text(title,
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF334155)),
+                  overflow: TextOverflow.ellipsis)),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(trailing, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-              Text(subtitle, style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold)),
+              Text(trailing,
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF0F172A))),
+              Text(subtitle,
+                  style: const TextStyle(
+                      fontSize: 9,
+                      color: Color(0xFF94A3B8),
+                      fontWeight: FontWeight.bold)),
             ],
           )
         ],

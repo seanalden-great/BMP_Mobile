@@ -1,7 +1,22 @@
+import 'package:bmp_mobile/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/profile_controller.dart';
+import '../settings/role_matrix_view.dart';
+
+void logout() async {
+  // Hapus sesi lokal
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('auth_token');
+
+  // Jangan lupa panggil API Logout ke server (Opsional tapi disarankan)
+  // ...
+
+  // Lempar kembali ke halaman Login secara permanen (hapus histori navigasi)
+  Get.offAllNamed(Routes.LOGIN);
+}
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -12,6 +27,29 @@ class ProfileView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // Slate-100
+      appBar: AppBar(
+        title: const Text('Profil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: const Color(0xFF2563EB),
+        foregroundColor: const Color(0xFF1E293B),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Keluar',
+            onPressed: () {
+              Get.defaultDialog(
+                title: "Konfirmasi Keluar",
+                middleText: "Anda yakin ingin keluar dari sistem?",
+                textCancel: "Batal",
+                textConfirm: "Ya, Keluar",
+                confirmTextColor: Colors.white,
+                buttonColor: Colors.red,
+                onConfirm: () => logout(),
+              );
+            },
+          )
+        ],
+      ),
       body: Obx(() {
         if (controller.isLoading.value && controller.userProfile.isEmpty) {
           return const Center(child: CircularProgressIndicator(color: Color(0xFF2563EB)));
@@ -49,6 +87,46 @@ class ProfileView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 32),
+
+              // Tombol Khusus Admin / Direktur / Developer ke Matriks Hak Akses
+              if (['Admin', 'Direktur', 'Developer'].contains(user['role'])) ...[
+                InkWell(
+                  onTap: () => Get.to(() => const RoleMatrixView()),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.indigo.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade600,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.admin_panel_settings, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Matriks Hak Akses (RBAC)', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B), fontSize: 14)),
+                              Text('Atur halaman yang dapat diakses tiap jabatan', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, color: Color(0xFF475569)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
 
               const Text('Informasi Personal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
               const SizedBox(height: 12),
