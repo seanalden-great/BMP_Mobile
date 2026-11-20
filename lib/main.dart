@@ -1,3 +1,4 @@
+import 'package:bmp_mobile/services/sync_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,11 +8,14 @@ import 'routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Cek apakah user sudah login sebelumnya dengan membaca Token di lokal HP
   final prefs = await SharedPreferences.getInstance();
   final String? token = prefs.getString('auth_token');
-  final String initialRoute = (token != null && token.isNotEmpty) ? Routes.MAIN_LAYOUT : Routes.LOGIN;
+  final String initialRoute =
+      (token != null && token.isNotEmpty) ? Routes.MAIN_LAYOUT : Routes.LOGIN;
+
+  await Get.putAsync(() => SyncService().init());
 
   runApp(BMPErpApp(initialRoute: initialRoute));
 }
@@ -30,7 +34,7 @@ class BMPErpApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2563EB), // Tailwind Blue-600
           primary: const Color(0xFF2563EB),
-          surface: const Color(0xFFF8FAFC), 
+          surface: const Color(0xFFF8FAFC),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF2563EB),
