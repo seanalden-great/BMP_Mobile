@@ -1,4 +1,6 @@
+import 'package:bmp_mobile/services/language_service.dart';
 import 'package:bmp_mobile/services/sync_service.dart';
+import 'package:bmp_mobile/translations/app_translations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +18,7 @@ void main() async {
       (token != null && token.isNotEmpty) ? Routes.MAIN_LAYOUT : Routes.LOGIN;
 
   await Get.putAsync(() => SyncService().init());
+  await Get.putAsync(() => LanguageService().init());
 
   runApp(BMPErpApp(initialRoute: initialRoute));
 }
@@ -27,9 +30,14 @@ class BMPErpApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final langService = Get.find<LanguageService>();
+
     return GetMaterialApp(
       title: 'BMP ERP Mobile',
       debugShowCheckedModeBanner: false,
+      translations: AppTranslations(),
+      locale: langService.currentLocale.value,
+      fallbackLocale: const Locale('id', 'ID'),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2563EB), // Tailwind Blue-600

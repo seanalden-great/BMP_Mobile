@@ -198,10 +198,16 @@ class DashboardController extends GetxController {
               .saveCache('dashboard_data', jsonEncode(payload));
           _applyDashboardData(payload);
         }
-      } else if (response.statusCode == 401) {
-        Get.snackbar('Sesi Berakhir', 'Silakan login kembali.',
+      } 
+      // else if (response.statusCode == 401) {
+      //   Get.snackbar('Sesi Berakhir', 'Silakan login kembali.',
+      //       backgroundColor: Colors.amber);
+      // }
+      else if (response.statusCode == 401) {
+        Get.snackbar('session_expired'.tr, 'please_login_again'.tr,
             backgroundColor: Colors.amber);
-      } else {
+      } 
+      else {
         await _loadDashboardFromCache();
       }
     } catch (e) {
