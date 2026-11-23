@@ -140,7 +140,8 @@ class RolePermissionController extends GetxController {
   var isLoading = true.obs;
   var isSaving = false.obs;
 
-  var currentRole = 'Staff'.obs;
+  // var currentRole = 'Staff'.obs;
+  var currentRole = 'Gudang'.obs;
   var roles = <String>[].obs;
   var menus = <String>[].obs;
   var permissions = <String, Map<String, List<String>>>{}.obs;
@@ -184,9 +185,19 @@ class RolePermissionController extends GetxController {
     }
   }
 
+  // // Cek apakah role tertentu boleh mengakses (Read) menu tertentu
+  // bool hasReadAccess(String role, String menu) {
+  //   if (permissions.isEmpty && (role == 'Admin' || role == 'Direktur')) {
+  //     return true;
+  //   }
+  //   final actions = permissions[role]?[menu];
+  //   return actions != null && actions.contains('R');
+  // }
+
   // Cek apakah role tertentu boleh mengakses (Read) menu tertentu
   bool hasReadAccess(String role, String menu) {
-    if (permissions.isEmpty && (role == 'Admin' || role == 'Direktur')) {
+    if (permissions.isEmpty &&
+        (role == 'Admin' || role == 'Direktur' || role == 'Developer')) {
       return true;
     }
     final actions = permissions[role]?[menu];

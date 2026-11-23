@@ -474,15 +474,34 @@ class ApprovalController extends GetxController {
   }
 
   // Dialog Konfirmasi sebelum memproses
+  // void confirmAction(String url, bool isApprove) {
+  //   final actionText = isApprove ? 'Setujui' : 'Tolak';
+  //   final actionColor = isApprove ? Colors.green.shade700 : Colors.red.shade700;
+
+  //   Get.defaultDialog(
+  //     title: "Konfirmasi",
+  //     middleText: "Anda yakin ingin $actionText dokumen ini?",
+  //     textCancel: "Batal",
+  //     textConfirm: "Ya, $actionText",
+  //     confirmTextColor: Colors.white,
+  //     buttonColor: actionColor,
+  //     onConfirm: () {
+  //       Get.back();
+  //       processDocument(url, isApprove);
+  //     },
+  //   );
+  // }
+
   void confirmAction(String url, bool isApprove) {
-    final actionText = isApprove ? 'Setujui' : 'Tolak';
     final actionColor = isApprove ? Colors.green.shade700 : Colors.red.shade700;
 
     Get.defaultDialog(
-      title: "Konfirmasi",
-      middleText: "Anda yakin ingin $actionText dokumen ini?",
-      textCancel: "Batal",
-      textConfirm: "Ya, $actionText",
+      title: 'confirm_title'.tr,
+      middleText: isApprove
+          ? 'appr_confirm_approve_msg'.tr
+          : 'appr_confirm_reject_msg'.tr,
+      textCancel: 'cancel'.tr,
+      textConfirm: isApprove ? 'appr_yes_approve'.tr : 'appr_yes_reject'.tr,
       confirmTextColor: Colors.white,
       buttonColor: actionColor,
       onConfirm: () {

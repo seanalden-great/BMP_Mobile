@@ -30,8 +30,15 @@ class RolePermissionData {
       });
     }
 
+    // return RolePermissionData(
+    //   currentRole: json['current_role']?.toString() ?? 'Staff',
+    //   roles: List<String>.from(json['roles'] ?? []),
+    //   menus: List<String>.from(json['menus'] ?? []),
+    //   permissions: parsedPermissions,
+    // );
+
     return RolePermissionData(
-      currentRole: json['current_role']?.toString() ?? 'Staff',
+      currentRole: json['current_role']?.toString() ?? 'Gudang',
       roles: List<String>.from(json['roles'] ?? []),
       menus: List<String>.from(json['menus'] ?? []),
       permissions: parsedPermissions,

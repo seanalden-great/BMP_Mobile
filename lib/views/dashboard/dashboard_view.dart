@@ -1125,8 +1125,447 @@
 //   }
 // }
 
+// import 'package:bmp_mobile/routes/app_pages.dart';
+// import 'package:bmp_mobile/services/language_service.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:intl/intl.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../controllers/dashboard_controller.dart';
+
+// void logout() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.remove('auth_token');
+//   Get.offAllNamed(Routes.LOGIN);
+// }
+
+// class DashboardView extends StatelessWidget {
+//   const DashboardView({super.key});
+
+//   String _formatRp(double number) {
+//     return NumberFormat.currency(
+//             locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
+//         .format(number);
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final controller = Get.put(DashboardController());
+//     final langService = Get.find<LanguageService>();
+
+//     return Scaffold(
+//       backgroundColor: const Color(0xFFF1F5F9),
+//       appBar: AppBar(
+//         title: Text('home'.tr,
+//             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+//         backgroundColor: const Color(0xFF2563EB),
+//         foregroundColor: Colors.white,
+//         elevation: 0,
+//         actions: [
+//           // Tombol Ganti Bahasa (ID / EN)
+//           Obx(() => TextButton(
+//                 onPressed: langService.toggleLanguage,
+//                 child: Container(
+//                   padding:
+//                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+//                   decoration: BoxDecoration(
+//                     color: Colors.white.withOpacity(0.2),
+//                     borderRadius: BorderRadius.circular(6),
+//                   ),
+//                   child: Text(
+//                     langService.isIndonesian ? 'ID' : 'EN',
+//                     style: const TextStyle(
+//                       color: Colors.white,
+//                       fontWeight: FontWeight.bold,
+//                       fontSize: 12,
+//                     ),
+//                   ),
+//                 ),
+//               )),
+//           IconButton(
+//             icon: const Icon(Icons.logout, color: Colors.white),
+//             tooltip: 'logout'.tr,
+//             onPressed: () {
+//               Get.defaultDialog(
+//                 title: 'logout_confirm_title'.tr,
+//                 middleText: 'logout_confirm_msg'.tr,
+//                 textCancel: 'cancel'.tr,
+//                 textConfirm: 'yes_logout'.tr,
+//                 confirmTextColor: Colors.white,
+//                 buttonColor: Colors.red,
+//                 onConfirm: () => logout(),
+//               );
+//             },
+//           )
+//         ],
+//       ),
+//       body: Column(
+//         children: [
+//           // Banner Status Offline / Antrean Sinkronisasi
+//           Obx(() {
+//             final sync = controller.syncService;
+//             if (sync.isOnline.value && sync.pendingCount.value == 0) {
+//               return const SizedBox.shrink();
+//             }
+
+//             final bool online = sync.isOnline.value;
+//             return Container(
+//               width: double.infinity,
+//               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+//               color: online ? Colors.amber.shade100 : Colors.red.shade100,
+//               child: Row(
+//                 children: [
+//                   Icon(
+//                     online ? Icons.cloud_upload : Icons.wifi_off,
+//                     size: 18,
+//                     color: online ? Colors.amber.shade900 : Colors.red.shade900,
+//                   ),
+//                   const SizedBox(width: 10),
+//                   Expanded(
+//                     child: Text(
+//                       !online
+//                           ? 'offline_mode_queue'.trParams(
+//                               {'count': '${sync.pendingCount.value}'})
+//                           : 'pending_sync_msg'.trParams(
+//                               {'count': '${sync.pendingCount.value}'}),
+//                       style: TextStyle(
+//                         fontSize: 12,
+//                         fontWeight: FontWeight.bold,
+//                         color: online
+//                             ? Colors.amber.shade900
+//                             : Colors.red.shade900,
+//                       ),
+//                     ),
+//                   ),
+//                   if (online && !sync.isSyncing.value)
+//                     TextButton(
+//                       onPressed: sync.syncPendingQueue,
+//                       style: TextButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(horizontal: 8),
+//                         minimumSize: const Size(50, 28),
+//                       ),
+//                       child: Text('sync'.tr,
+//                           style: const TextStyle(fontWeight: FontWeight.bold)),
+//                     ),
+//                   if (sync.isSyncing.value)
+//                     const SizedBox(
+//                       width: 16,
+//                       height: 16,
+//                       child: CircularProgressIndicator(strokeWidth: 2),
+//                     ),
+//                 ],
+//               ),
+//             );
+//           }),
+
+//           // Konten Dashboard
+//           Expanded(
+//             child: Obx(() {
+//               final sum = controller.summary.value;
+//               if (controller.isLoading.value && sum == null) {
+//                 return const Center(
+//                     child: CircularProgressIndicator(color: Color(0xFF2563EB)));
+//               }
+
+//               return RefreshIndicator(
+//                 onRefresh: controller.fetchDashboardData,
+//                 color: const Color(0xFF2563EB),
+//                 child: ListView(
+//                   padding: const EdgeInsets.all(20.0),
+//                   children: [
+//                     // Header
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               'dashboard'.tr,
+//                               style: const TextStyle(
+//                                   fontSize: 22,
+//                                   fontWeight: FontWeight.bold,
+//                                   color: Color(0xFF1E293B)),
+//                             ),
+//                             Text(
+//                               sum?.bulan ?? 'current_month'.tr,
+//                               style: const TextStyle(
+//                                   color: Color(0xFF64748B),
+//                                   fontWeight: FontWeight.w500),
+//                             ),
+//                           ],
+//                         ),
+//                         CircleAvatar(
+//                           backgroundColor: const Color(0xFF2563EB),
+//                           child: IconButton(
+//                             icon: const Icon(Icons.sync, color: Colors.white),
+//                             onPressed: controller.fetchDashboardData,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(height: 24),
+
+//                     // KPI Progress Bar Target
+//                     Container(
+//                       padding: const EdgeInsets.all(16),
+//                       decoration: BoxDecoration(
+//                         color: Colors.white,
+//                         borderRadius: BorderRadius.circular(16),
+//                         border: Border.all(color: const Color(0xFFE2E8F0)),
+//                       ),
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Row(
+//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                             children: [
+//                               Text('sales_target'.tr,
+//                                   style: const TextStyle(
+//                                       fontSize: 12,
+//                                       fontWeight: FontWeight.bold,
+//                                       color: Color(0xFF94A3B8))),
+//                               Text('${sum?.persentaseTarget ?? 0}%',
+//                                   style: const TextStyle(
+//                                       fontSize: 16,
+//                                       fontWeight: FontWeight.w900,
+//                                       color: Color(0xFF2563EB))),
+//                             ],
+//                           ),
+//                           const SizedBox(height: 8),
+//                           LinearProgressIndicator(
+//                             value: sum?.targetProgress ?? 0.0,
+//                             backgroundColor: const Color(0xFFF1F5F9),
+//                             color: const Color(0xFF2563EB),
+//                             minHeight: 10,
+//                             borderRadius: BorderRadius.circular(10),
+//                           ),
+//                           const SizedBox(height: 8),
+//                           Text(
+//                               '${_formatRp(sum?.pendapatan ?? 0)} / ${_formatRp(sum?.targetPenjualan ?? 0)}',
+//                               style: const TextStyle(
+//                                   fontSize: 12,
+//                                   fontWeight: FontWeight.bold,
+//                                   color: Color(0xFF1E293B))),
+//                         ],
+//                       ),
+//                     ),
+//                     const SizedBox(height: 16),
+
+//                     // Kartu Saldo Kas & Net Profit
+//                     Row(
+//                       children: [
+//                         Expanded(
+//                           flex: 2,
+//                           child: Container(
+//                             padding: const EdgeInsets.all(16),
+//                             decoration: BoxDecoration(
+//                               gradient: const LinearGradient(
+//                                   colors: [
+//                                     Color(0xFF1E293B),
+//                                     Color(0xFF334155)
+//                                   ],
+//                                   begin: Alignment.topLeft,
+//                                   end: Alignment.bottomRight),
+//                               borderRadius: BorderRadius.circular(16),
+//                               boxShadow: [
+//                                 BoxShadow(
+//                                     color: Colors.black.withOpacity(0.1),
+//                                     blurRadius: 10,
+//                                     offset: const Offset(0, 4))
+//                               ],
+//                             ),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text('cash_bank_balance'.tr,
+//                                     style: const TextStyle(
+//                                         color: Color(0xFF94A3B8),
+//                                         fontSize: 10,
+//                                         fontWeight: FontWeight.bold,
+//                                         letterSpacing: 1.0)),
+//                                 const SizedBox(height: 8),
+//                                 Text(_formatRp(sum?.saldoKas ?? 0),
+//                                     style: const TextStyle(
+//                                         color: Colors.white,
+//                                         fontSize: 18,
+//                                         fontWeight: FontWeight.w900)),
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                         const SizedBox(width: 12),
+//                         Expanded(
+//                           flex: 1,
+//                           child: Container(
+//                             padding: const EdgeInsets.all(16),
+//                             decoration: BoxDecoration(
+//                               gradient: const LinearGradient(colors: [
+//                                 Color(0xFF4F46E5),
+//                                 Color(0xFF2563EB)
+//                               ]),
+//                               borderRadius: BorderRadius.circular(16),
+//                             ),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.center,
+//                               children: [
+//                                 Text('margin'.tr,
+//                                     style: const TextStyle(
+//                                         color: Color(0xFFC7D2FE),
+//                                         fontSize: 10,
+//                                         fontWeight: FontWeight.bold)),
+//                                 const SizedBox(height: 8),
+//                                 Text('${sum?.profitMargin ?? 0}%',
+//                                     style: const TextStyle(
+//                                         color: Colors.white,
+//                                         fontSize: 18,
+//                                         fontWeight: FontWeight.w900)),
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(height: 16),
+
+//                     // Grid Pendapatan & Pengeluaran
+//                     Row(
+//                       children: [
+//                         Expanded(
+//                             child: _buildSummaryCard(
+//                                 'revenue'.tr,
+//                                 _formatRp(sum?.pendapatan ?? 0),
+//                                 Icons.arrow_upward,
+//                                 const Color(0xFF10B981))),
+//                         const SizedBox(width: 12),
+//                         Expanded(
+//                             child: _buildSummaryCard(
+//                                 'expenses'.tr,
+//                                 _formatRp(sum?.pengeluaran ?? 0),
+//                                 Icons.arrow_downward,
+//                                 const Color(0xFFEF4444))),
+//                       ],
+//                     ),
+//                     const SizedBox(height: 24),
+
+//                     // Section List: Top Customers & Low Stocks
+//                     Text('business_insights'.tr,
+//                         style: const TextStyle(
+//                             fontSize: 16,
+//                             fontWeight: FontWeight.bold,
+//                             color: Color(0xFF1E293B))),
+//                     const SizedBox(height: 12),
+
+//                     _buildSectionTitle(
+//                         'top_customers'.tr, Icons.star, Colors.amber),
+//                     ...controller.topCustomers.map((c) => _buildListTile(
+//                         c.name, _formatRp(c.totalSpent), 'total_spending'.tr)),
+
+//                     const SizedBox(height: 12),
+//                     _buildSectionTitle('low_stock'.tr,
+//                         Icons.warning_amber_rounded, Colors.orange),
+//                     ...controller.lowStocks.map((s) => _buildListTile(
+//                         s.name, '${s.totalStock} ${s.unit}', 'remaining_stock'.tr)),
+//                   ],
+//                 ),
+//               );
+//             }),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildSummaryCard(
+//       String title, String amount, IconData icon, Color color) {
+//     return Container(
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(16),
+//         border: Border.all(color: const Color(0xFFE2E8F0)),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Icon(icon, color: color, size: 20),
+//           const SizedBox(height: 8),
+//           Text(title,
+//               style: const TextStyle(
+//                   fontSize: 11,
+//                   color: Color(0xFF64748B),
+//                   fontWeight: FontWeight.bold)),
+//           const SizedBox(height: 4),
+//           Text(amount,
+//               style: const TextStyle(
+//                   fontSize: 14,
+//                   fontWeight: FontWeight.w900,
+//                   color: Color(0xFF1E293B))),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildSectionTitle(String title, IconData icon, Color color) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 8.0, top: 8.0),
+//       child: Row(
+//         children: [
+//           Icon(icon, size: 16, color: color),
+//           const SizedBox(width: 8),
+//           Text(title,
+//               style: const TextStyle(
+//                   fontSize: 14,
+//                   fontWeight: FontWeight.bold,
+//                   color: Color(0xFF475569))),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildListTile(String title, String trailing, String subtitle) {
+//     return Container(
+//       margin: const EdgeInsets.only(bottom: 8),
+//       padding: const EdgeInsets.all(12),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(12),
+//         border: Border.all(color: const Color(0xFFF1F5F9)),
+//       ),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Expanded(
+//               child: Text(title,
+//                   style: const TextStyle(
+//                       fontSize: 13,
+//                       fontWeight: FontWeight.bold,
+//                       color: Color(0xFF334155)),
+//                   overflow: TextOverflow.ellipsis)),
+//           Column(
+//             crossAxisAlignment: CrossAxisAlignment.end,
+//             children: [
+//               Text(trailing,
+//                   style: const TextStyle(
+//                       fontSize: 13,
+//                       fontWeight: FontWeight.w900,
+//                       color: Color(0xFF0F172A))),
+//               Text(subtitle,
+//                   style: const TextStyle(
+//                       fontSize: 9,
+//                       color: Color(0xFF94A3B8),
+//                       fontWeight: FontWeight.bold)),
+//             ],
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 import 'package:bmp_mobile/routes/app_pages.dart';
 import 'package:bmp_mobile/services/language_service.dart';
+import 'package:bmp_mobile/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -1152,16 +1591,42 @@ class DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(DashboardController());
     final langService = Get.find<LanguageService>();
+    final themeService = Get.find<ThemeService>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Palet warna dinamis
+    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor =
+        isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final textPrimary =
+        isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B);
+    final textSecondary =
+        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: bgColor,
       appBar: AppBar(
         title: Text('home'.tr,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: const Color(0xFF2563EB),
+        backgroundColor:
+            isDark ? const Color(0xFF1E293B) : const Color(0xFF2563EB),
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
+          // Tombol Ganti Tema (Dark / Light Mode)
+          Obx(() => IconButton(
+                icon: Icon(
+                  themeService.isDarkMode.value
+                      ? Icons.light_mode_rounded
+                      : Icons.dark_mode_rounded,
+                  color: Colors.white,
+                ),
+                tooltip: themeService.isDarkMode.value
+                    ? 'Light Mode'
+                    : 'Dark Mode',
+                onPressed: themeService.toggleTheme,
+              )),
           // Tombol Ganti Bahasa (ID / EN)
           Obx(() => TextButton(
                 onPressed: langService.toggleLanguage,
@@ -1212,13 +1677,23 @@ class DashboardView extends StatelessWidget {
             return Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: online ? Colors.amber.shade100 : Colors.red.shade100,
+              color: online
+                  ? (isDark
+                      ? Colors.amber.shade900.withOpacity(0.3)
+                      : Colors.amber.shade100)
+                  : (isDark
+                      ? Colors.red.shade900.withOpacity(0.3)
+                      : Colors.red.shade100),
               child: Row(
                 children: [
                   Icon(
                     online ? Icons.cloud_upload : Icons.wifi_off,
                     size: 18,
-                    color: online ? Colors.amber.shade900 : Colors.red.shade900,
+                    color: online
+                        ? (isDark
+                            ? Colors.amber.shade300
+                            : Colors.amber.shade900)
+                        : (isDark ? Colors.red.shade300 : Colors.red.shade900),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -1232,8 +1707,12 @@ class DashboardView extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: online
-                            ? Colors.amber.shade900
-                            : Colors.red.shade900,
+                            ? (isDark
+                                ? Colors.amber.shade200
+                                : Colors.amber.shade900)
+                            : (isDark
+                                ? Colors.red.shade200
+                                : Colors.red.shade900),
                       ),
                     ),
                   ),
@@ -1282,15 +1761,15 @@ class DashboardView extends StatelessWidget {
                           children: [
                             Text(
                               'dashboard'.tr,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E293B)),
+                                  color: textPrimary),
                             ),
                             Text(
                               sum?.bulan ?? 'current_month'.tr,
-                              style: const TextStyle(
-                                  color: Color(0xFF64748B),
+                              style: TextStyle(
+                                  color: textSecondary,
                                   fontWeight: FontWeight.w500),
                             ),
                           ],
@@ -1310,9 +1789,9 @@ class DashboardView extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(color: borderColor),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1321,21 +1800,23 @@ class DashboardView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('sales_target'.tr,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF94A3B8))),
+                                      color: textSecondary)),
                               Text('${sum?.persentaseTarget ?? 0}%',
                                   style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w900,
-                                      color: Color(0xFF2563EB))),
+                                      color: Color(0xFF3B82F6))),
                             ],
                           ),
                           const SizedBox(height: 8),
                           LinearProgressIndicator(
                             value: sum?.targetProgress ?? 0.0,
-                            backgroundColor: const Color(0xFFF1F5F9),
+                            backgroundColor: isDark
+                                ? const Color(0xFF0F172A)
+                                : const Color(0xFFF1F5F9),
                             color: const Color(0xFF2563EB),
                             minHeight: 10,
                             borderRadius: BorderRadius.circular(10),
@@ -1343,10 +1824,10 @@ class DashboardView extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                               '${_formatRp(sum?.pendapatan ?? 0)} / ${_formatRp(sum?.targetPenjualan ?? 0)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E293B))),
+                                  color: textPrimary)),
                         ],
                       ),
                     ),
@@ -1368,9 +1849,12 @@ class DashboardView extends StatelessWidget {
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight),
                               borderRadius: BorderRadius.circular(16),
+                              border: isDark
+                                  ? Border.all(color: const Color(0xFF475569))
+                                  : null,
                               boxShadow: [
                                 BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withOpacity(0.15),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4))
                               ],
@@ -1436,36 +1920,44 @@ class DashboardView extends StatelessWidget {
                                 'revenue'.tr,
                                 _formatRp(sum?.pendapatan ?? 0),
                                 Icons.arrow_upward,
-                                const Color(0xFF10B981))),
+                                const Color(0xFF10B981),
+                                isDark)),
                         const SizedBox(width: 12),
                         Expanded(
                             child: _buildSummaryCard(
                                 'expenses'.tr,
                                 _formatRp(sum?.pengeluaran ?? 0),
                                 Icons.arrow_downward,
-                                const Color(0xFFEF4444))),
+                                const Color(0xFFEF4444),
+                                isDark)),
                       ],
                     ),
                     const SizedBox(height: 24),
 
                     // Section List: Top Customers & Low Stocks
                     Text('business_insights'.tr,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B))),
+                            color: textPrimary)),
                     const SizedBox(height: 12),
 
                     _buildSectionTitle(
-                        'top_customers'.tr, Icons.star, Colors.amber),
+                        'top_customers'.tr, Icons.star, Colors.amber, isDark),
                     ...controller.topCustomers.map((c) => _buildListTile(
-                        c.name, _formatRp(c.totalSpent), 'total_spending'.tr)),
+                        c.name,
+                        _formatRp(c.totalSpent),
+                        'total_spending'.tr,
+                        isDark)),
 
                     const SizedBox(height: 12),
                     _buildSectionTitle('low_stock'.tr,
-                        Icons.warning_amber_rounded, Colors.orange),
+                        Icons.warning_amber_rounded, Colors.orange, isDark),
                     ...controller.lowStocks.map((s) => _buildListTile(
-                        s.name, '${s.totalStock} ${s.unit}', 'remaining_stock'.tr)),
+                        s.name,
+                        '${s.totalStock} ${s.unit}',
+                        'remaining_stock'.tr,
+                        isDark)),
                   ],
                 ),
               );
@@ -1477,13 +1969,14 @@ class DashboardView extends StatelessWidget {
   }
 
   Widget _buildSummaryCard(
-      String title, String amount, IconData icon, Color color) {
+      String title, String amount, IconData icon, Color color, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1491,22 +1984,27 @@ class DashboardView extends StatelessWidget {
           Icon(icon, color: color, size: 20),
           const SizedBox(height: 8),
           Text(title,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 11,
-                  color: Color(0xFF64748B),
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
                   fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text(amount,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF1E293B))),
+                  color: isDark
+                      ? const Color(0xFFF8FAFC)
+                      : const Color(0xFF1E293B))),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title, IconData icon, Color color) {
+  Widget _buildSectionTitle(
+      String title, IconData icon, Color color, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, top: 8.0),
       child: Row(
@@ -1514,42 +2012,50 @@ class DashboardView extends StatelessWidget {
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 8),
           Text(title,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF475569))),
+                  color: isDark
+                      ? const Color(0xFFCBD5E1)
+                      : const Color(0xFF475569))),
         ],
       ),
     );
   }
 
-  Widget _buildListTile(String title, String trailing, String subtitle) {
+  Widget _buildListTile(
+      String title, String trailing, String subtitle, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
               child: Text(title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF334155)),
+                      color: isDark
+                          ? const Color(0xFFE2E8F0)
+                          : const Color(0xFF334155)),
                   overflow: TextOverflow.ellipsis)),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(trailing,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A))),
+                      color: isDark
+                          ? const Color(0xFFF8FAFC)
+                          : const Color(0xFF0F172A))),
               Text(subtitle,
                   style: const TextStyle(
                       fontSize: 9,

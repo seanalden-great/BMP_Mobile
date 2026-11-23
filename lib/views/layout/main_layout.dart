@@ -105,6 +105,117 @@
 //   }
 // }
 
+// import 'package:bmp_mobile/controllers/role_permission_controller.dart';
+// import 'package:bmp_mobile/views/approval/approval_view.dart';
+// import 'package:bmp_mobile/views/dashboard/dashboard_view.dart';
+// import 'package:bmp_mobile/views/products/product_view.dart';
+// import 'package:bmp_mobile/views/profile/profile_view.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../routes/app_pages.dart';
+// import '../inventory/inventory_view.dart';
+
+// class MainLayoutController extends GetxController {
+//   var selectedIndex = 0.obs;
+
+//   void changePage(int index) {
+//     selectedIndex.value = index;
+//   }
+
+//   void logout() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.remove('auth_token');
+//     Get.delete<RolePermissionController>();
+//     Get.offAllNamed(Routes.LOGIN);
+//   }
+// }
+
+// class MainLayout extends StatelessWidget {
+//   const MainLayout({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final controller = Get.put(MainLayoutController());
+//     final permController = Get.put(RolePermissionController());
+
+//     return Obx(() {
+//       if (permController.isLoading.value && permController.permissions.isEmpty) {
+//         return const Scaffold(
+//           body: Center(child: CircularProgressIndicator(color: Color(0xFF2563EB))),
+//         );
+//       }
+
+//       // Susun halaman & tab secara dinamis berdasarkan hak akses user
+//       final List<Widget> allowedPages = [];
+//       final List<NavigationDestination> allowedDestinations = [];
+
+//       if (permController.canCurrentUserAccess('Dashboard')) {
+//         allowedPages.add(const DashboardView());
+//         allowedDestinations.add(const NavigationDestination(
+//           icon: Icon(Icons.dashboard_outlined),
+//           selectedIcon: Icon(Icons.dashboard, color: Color(0xFF2563EB)),
+//           label: 'Dasbor',
+//         ));
+//       }
+
+//       if (permController.canCurrentUserAccess('Inventori')) {
+//         allowedPages.add(const InventoryView());
+//         allowedDestinations.add(const NavigationDestination(
+//           icon: Icon(Icons.inventory_2_outlined),
+//           selectedIcon: Icon(Icons.inventory_2, color: Color(0xFF2563EB)),
+//           label: 'Inventori',
+//         ));
+//       }
+
+//       if (permController.canCurrentUserAccess('Produk')) {
+//         allowedPages.add(const ProductView());
+//         allowedDestinations.add(const NavigationDestination(
+//           icon: Icon(Icons.shopping_bag_outlined),
+//           selectedIcon: Icon(Icons.shopping_bag, color: Color(0xFF2563EB)),
+//           label: 'Produk',
+//         ));
+//       }
+
+//       if (permController.canCurrentUserAccess('Persetujuan')) {
+//         allowedPages.add(const ApprovalView());
+//         allowedDestinations.add(const NavigationDestination(
+//           icon: Badge(child: Icon(Icons.fact_check_outlined)),
+//           selectedIcon: Badge(child: Icon(Icons.fact_check, color: Color(0xFF2563EB))),
+//           label: 'Persetujuan',
+//         ));
+//       }
+
+//       // Profil selalu ada untuk semua role
+//       allowedPages.add(const ProfileView());
+//       allowedDestinations.add(const NavigationDestination(
+//         icon: Icon(Icons.person_outline),
+//         selectedIcon: Icon(Icons.person, color: Color(0xFF2563EB)),
+//         label: 'Profil',
+//       ));
+
+//       // Pengaman agar selectedIndex tidak out-of-range saat hak akses berubah
+//       final safeIndex = controller.selectedIndex.value >= allowedPages.length
+//           ? 0
+//           : controller.selectedIndex.value;
+
+//       return Scaffold(
+//         body: allowedPages[safeIndex],
+//         // NavigationBar Flutter butuh minimal 2 destinations
+//         bottomNavigationBar: allowedDestinations.length >= 2
+//             ? NavigationBar(
+//                 selectedIndex: safeIndex,
+//                 onDestinationSelected: controller.changePage,
+//                 backgroundColor: Colors.white,
+//                 indicatorColor: const Color(0xFFDBEAFE),
+//                 destinations: allowedDestinations,
+//               )
+//             : null,
+//       );
+//     });
+//   }
+// }
+
 import 'package:bmp_mobile/controllers/role_permission_controller.dart';
 import 'package:bmp_mobile/views/approval/approval_view.dart';
 import 'package:bmp_mobile/views/dashboard/dashboard_view.dart';
@@ -152,46 +263,46 @@ class MainLayout extends StatelessWidget {
 
       if (permController.canCurrentUserAccess('Dashboard')) {
         allowedPages.add(const DashboardView());
-        allowedDestinations.add(const NavigationDestination(
-          icon: Icon(Icons.dashboard_outlined),
-          selectedIcon: Icon(Icons.dashboard, color: Color(0xFF2563EB)),
-          label: 'Dasbor',
+        allowedDestinations.add(NavigationDestination(
+          icon: const Icon(Icons.dashboard_outlined),
+          selectedIcon: const Icon(Icons.dashboard, color: Color(0xFF2563EB)),
+          label: 'nav_dashboard'.tr,
         ));
       }
 
       if (permController.canCurrentUserAccess('Inventori')) {
         allowedPages.add(const InventoryView());
-        allowedDestinations.add(const NavigationDestination(
-          icon: Icon(Icons.inventory_2_outlined),
-          selectedIcon: Icon(Icons.inventory_2, color: Color(0xFF2563EB)),
-          label: 'Inventori',
+        allowedDestinations.add(NavigationDestination(
+          icon: const Icon(Icons.inventory_2_outlined),
+          selectedIcon: const Icon(Icons.inventory_2, color: Color(0xFF2563EB)),
+          label: 'nav_inventory'.tr,
         ));
       }
 
       if (permController.canCurrentUserAccess('Produk')) {
         allowedPages.add(const ProductView());
-        allowedDestinations.add(const NavigationDestination(
-          icon: Icon(Icons.shopping_bag_outlined),
-          selectedIcon: Icon(Icons.shopping_bag, color: Color(0xFF2563EB)),
-          label: 'Produk',
+        allowedDestinations.add(NavigationDestination(
+          icon: const Icon(Icons.shopping_bag_outlined),
+          selectedIcon: const Icon(Icons.shopping_bag, color: Color(0xFF2563EB)),
+          label: 'nav_products'.tr,
         ));
       }
 
       if (permController.canCurrentUserAccess('Persetujuan')) {
         allowedPages.add(const ApprovalView());
-        allowedDestinations.add(const NavigationDestination(
-          icon: Badge(child: Icon(Icons.fact_check_outlined)),
-          selectedIcon: Badge(child: Icon(Icons.fact_check, color: Color(0xFF2563EB))),
-          label: 'Persetujuan',
+        allowedDestinations.add(NavigationDestination(
+          icon: const Badge(child: Icon(Icons.fact_check_outlined)),
+          selectedIcon: const Badge(child: Icon(Icons.fact_check, color: Color(0xFF2563EB))),
+          label: 'nav_approvals'.tr,
         ));
       }
 
       // Profil selalu ada untuk semua role
       allowedPages.add(const ProfileView());
-      allowedDestinations.add(const NavigationDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person, color: Color(0xFF2563EB)),
-        label: 'Profil',
+      allowedDestinations.add(NavigationDestination(
+        icon: const Icon(Icons.person_outline),
+        selectedIcon: const Icon(Icons.person, color: Color(0xFF2563EB)),
+        label: 'nav_profile'.tr,
       ));
 
       // Pengaman agar selectedIndex tidak out-of-range saat hak akses berubah
@@ -199,15 +310,33 @@ class MainLayout extends StatelessWidget {
           ? 0
           : controller.selectedIndex.value;
 
+      // return Scaffold(
+      //   body: allowedPages[safeIndex],
+      //   // NavigationBar Flutter butuh minimal 2 destinations
+      //   bottomNavigationBar: allowedDestinations.length >= 2
+      //       ? NavigationBar(
+      //           selectedIndex: safeIndex,
+      //           onDestinationSelected: controller.changePage,
+      //           backgroundColor: Colors.white,
+      //           indicatorColor: const Color(0xFFDBEAFE),
+      //           destinations: allowedDestinations,
+      //         )
+      //       : null,
+      // );
+
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+
       return Scaffold(
         body: allowedPages[safeIndex],
-        // NavigationBar Flutter butuh minimal 2 destinations
         bottomNavigationBar: allowedDestinations.length >= 2
             ? NavigationBar(
                 selectedIndex: safeIndex,
                 onDestinationSelected: controller.changePage,
-                backgroundColor: Colors.white,
-                indicatorColor: const Color(0xFFDBEAFE),
+                backgroundColor:
+                    isDark ? const Color(0xFF1E293B) : Colors.white,
+                indicatorColor: isDark
+                    ? const Color(0xFF2563EB).withOpacity(0.25)
+                    : const Color(0xFFDBEAFE),
                 destinations: allowedDestinations,
               )
             : null,

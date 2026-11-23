@@ -196,10 +196,25 @@ class RegisterView extends StatelessWidget {
                       value: controller.selectedRole.value,
                       isExpanded: true,
                       icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2563EB)),
-                      items: ['Admin', 'Gudang', 'Developer', 'Direktur'].map((String value) {
+                      // items: ['Admin', 'Gudang', 'Developer', 'Direktur'].map((String value) {
+                      //   return DropdownMenuItem<String>(
+                      //     value: value,
+                      //     child: Text('Hak Akses: $value', style: const TextStyle(fontWeight: FontWeight.w600)),
+                      //   );
+                      // }).toList(),
+                      items: [
+                        'Admin',
+                        'Direktur',
+                        'HEAD/SPV',
+                        'Purchasing',
+                        'Gudang',
+                        'Developer',
+                      ].map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text('Hak Akses: $value', style: const TextStyle(fontWeight: FontWeight.w600)),
+                          child: Text('Hak Akses: $value',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600)),
                         );
                       }).toList(),
                       onChanged: (newValue) {
